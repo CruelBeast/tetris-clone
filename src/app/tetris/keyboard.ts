@@ -7,6 +7,8 @@ interface TrackedKey {
 export class Keyboard {
   private trackedKeys: Map<string, TrackedKey> = new Map();
 
+  /* ARR is Auto Repeat Rate
+     DAS is Delayed Auto Shift */
   constructor(private DAS: number, private ARR: number) {
     this.addEventListeners();
   }

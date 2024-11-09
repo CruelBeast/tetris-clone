@@ -1,3 +1,4 @@
+// Enum representing the different types of Tetriminos in Tetris
 const enum TetriminoType {
   I,
   J,
@@ -8,6 +9,7 @@ const enum TetriminoType {
   Z
 }
 
+// Colors associated with each Tetrimino type, used for rendering
 export const TetriminoColor = [
   'cyan',
   'blue',
@@ -18,55 +20,66 @@ export const TetriminoColor = [
   'red'
 ];
 
+// Shapes of each Tetrimino in their possible rotations, stored in a 3D array
 export const TetriminoShape = [
+  // 'I' Tetrimino rotations
   [[[0,0,0,0], [1,1,1,1], [0,0,0,0], [0,0,0,0]],
    [[0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,1,0]],
    [[0,0,0,0], [0,0,0,0], [1,1,1,1], [0,0,0,0]],
    [[0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0]]],
 
+   // 'J' Tetrimino rotations
   [[[1,0,0], [1,1,1], [0,0,0]],
    [[0,1,1], [0,1,0], [0,1,0]],
    [[0,0,0], [1,1,1], [0,0,1]],
    [[0,1,0], [0,1,0], [1,1,0]]],
 
+   // 'L' Tetrimino rotations
   [[[0,0,1], [1,1,1], [0,0,0]],
    [[0,1,0], [0,1,0], [0,1,1]],
    [[0,0,0], [1,1,1], [1,0,0]],
    [[1,1,0], [0,1,0], [0,1,0]]],
 
+   // 'O' Tetrimino rotations
   [[[1,1], [1,1]],
    [[1,1], [1,1]],
    [[1,1], [1,1]],
    [[1,1], [1,1]]],
 
+   // 'S' Tetrimino rotations
   [[[0,1,1], [1,1,0], [0,0,0]],
    [[0,1,0], [0,1,1], [0,0,1]],
    [[0,0,0], [0,1,1], [1,1,0]],
    [[1,0,0], [1,1,0], [0,1,0]]],
 
+   // 'T' Tetrimino rotations
   [[[0,1,0], [1,1,1], [0,0,0]],
    [[0,1,0], [0,1,1], [0,1,0]],
    [[0,0,0], [1,1,1], [0,1,0]],
    [[0,1,0], [1,1,0], [0,1,0]]],
 
+   // 'Z' Tetrimino rotations
   [[[1,1,0], [0,1,1], [0,0,0]],
    [[0,0,1], [0,1,1], [0,1,0]],
    [[0,0,0], [1,1,0], [0,1,1]],
    [[0,1,0], [1,1,0], [1,0,0]]],
 ];
 
+// Wall-kick tables for JLSTZ and I Tetriminos, allowing Tetriminos to be rotated against walls;
+// the 4 arrays represents the starting rotation of the tetromino and the array inside are the
+// left and rigth rotation kicktables
 const KickTableJLSTZ: Array<Array<Array<[number, number]> | undefined>> = [
-  [,[[0, 0], [-1, 0], [-1, +1], [0, -2], [-1, -2]],,[[0, 0], [+1, 0], [+1, +1], [0, -2], [+1, -2]]],
-  [[[0, 0], [+1, 0], [+1, -1], [0, +2], [+1, +2]],,[[0, 0], [+1, 0], [+1, -1], [0, +2], [+1, +2]],],
-  [,[[0, 0], [-1, 0], [-1, +1], [0, -2], [-1, -2]],,[[0, 0], [+1, 0], [+1, +1], [0, -2], [+1, -2]]],
-  [[[0, 0], [-1, 0], [-1, -1], [0, +2], [-1, +2]],,[[0, 0], [-1, 0], [-1, -1], [0, +2], [-1, +2]],],
+  [[[0, 0], [-1, 0], [-1, +1], [0, -2], [-1, -2]],[[0, 0], [+1, 0], [+1, +1], [0, -2], [+1, -2]]],
+  [[[0, 0], [+1, 0], [+1, -1], [0, +2], [+1, +2]],[[0, 0], [+1, 0], [+1, -1], [0, +2], [+1, +2]]],
+  [[[0, 0], [+1, 0], [+1, +1], [0, -2], [+1, -2]],[[0, 0], [-1, 0], [-1, +1], [0, -2], [-1, -2]]],
+  [[[0, 0], [-1, 0], [-1, -1], [0, +2], [-1, +2]],[[0, 0], [-1, 0], [-1, -1], [0, +2], [-1, +2]]],
 ];
 
 const KickTableI: Array<Array<Array<[number, number]> | undefined>> = [
-  [,[[0, 0], [-2, 0], [+1, 0], [-2, -1], [+1, +2]],,[[0, 0], [-1, 0], [+2, 0], [-1, +2], [+2, -1]]],
-  [[[0, 0], [+2, 0], [-1, 0], [+2, +1], [-1, -2]],,[[0, 0], [-1, 0], [+2, 0], [-1, +2], [+2, -1]],],
-  [,[[0, 0], [+1, 0], [-2, 0], [+1, -2], [-2, +1]],,[[0, 0], [+2, 0], [-1, 0], [+2, +1], [-1, -2]]],
-  [[[0, 0], [+1, 0], [-2, 0], [+1, -2], [-2, +1]],,[[0, 0], [-2, 0], [+1, 0], [-2, -1], [+1, +2]],],
+  [[[0, 0], [-2, 0], [+1, 0], [-2, -1], [+1, +2]],[[0, 0], [-1, 0], [+2, 0], [-1, +2], [+2, -1]]],
+  [[[0, 0], [-1, 0], [+2, 0], [-1, +2], [+2, -1]],[[0, 0], [+2, 0], [-1, 0], [+2, +1], [-1, -2]]],
+  [[[0, 0], [+2, 0], [-1, 0], [+2, +1], [-1, -2]],[[0, 0], [+1, 0], [-2, 0], [+1, -2], [-2, +1]]],
+  [[[0, 0], [+1, 0], [-2, 0], [+1, -2], [-2, +1]],[[0, 0], [-2, 0], [+1, 0], [-2, -1], [+1, +2]]],
 ];
 
 const enum TetrisState {
@@ -104,15 +117,14 @@ export class Tetris {
   private readonly COLS = 10;
 
   public playfield: Array<Array<number>>;
+  public tetrimino: Tetrimino;
+
   private bag: Array<TetriminoType> = [];
   private level = 1;
-  public tetrimino: Tetrimino;
   private state: TetrisState = TetrisState.Start;
   private movesSinceTouchDown: number = 0;
 
   private nextUpdateAt: number | null = null;
-
-  private renderer: Renderer = new Renderer();
 
   public start() {
     this.state = TetrisState.Falling;
@@ -206,7 +218,7 @@ export class Tetris {
     let kickTable: Array<[number, number]>;
 
     // check rotation and wall kicks
-    kickTable = (TetriminoType.I === this.tetrimino.type ? KickTableI : KickTableJLSTZ)[rotation][newRotation] as Array<[number, number]>;
+    kickTable = (TetriminoType.I === this.tetrimino.type ? KickTableI : KickTableJLSTZ)[rotation][direction] as Array<[number, number]>;
     for (let kick of kickTable) {
       let tetrimino = { ...this.tetrimino, col: col + kick[0], row: row + kick[1], rotation: newRotation }
       if (this.checkAndUpdateIfMoveValid(tetrimino)) {
@@ -351,7 +363,4 @@ export class Tetris {
 
     this.tetrimino = this.getNextTetrimino();
   }
-}
-
-class Renderer {
 }
