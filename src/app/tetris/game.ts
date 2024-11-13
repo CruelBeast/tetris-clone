@@ -123,12 +123,66 @@ export class Tetris {
   private level = 1;
   private state: TetrisState = TetrisState.Start;
   private movesSinceTouchDown: number = 0;
-
   private nextUpdateAt: number | null = null;
 
   public start() {
     this.state = TetrisState.Falling;
     this.scheduleNextUpdate();
+  }
+
+  public update() {
+    if( [TetrisState.Start, TetrisState.Paused, TetrisState.GameOver].includes(this.state) || !this.nextUpdateAt || Date.now() < this.nextUpdateAt) {
+      return;
+    }
+
+    if (this.state === TetrisState.Falling) {
+      this.handleFallingState();
+    } else if (this.state === TetrisState.Locking) {
+      this.lockPieceAndClear();
+      return;
+    } else if (this.state === TetrisState.Clearing) {
+      this.handleClearingState();
+    }
+
+    this.scheduleNextUpdate();
+  }
+
+  private handleFallingState() {
+    this.fall()
+    if (this.hasTouchedDown()) {
+      this.state = TetrisState.Locking;
+    }
+  }
+
+  public drop() {
+    while (this.fall()) {}
+  }
+
+  public moveLeft(): boolean {
+    const tetrimino = { ...this.tetrimino, col: this.tetrimino.col - 1 };
+    return this.checkAndUpdateIfMoveValid(tetrimino);
+  }
+
+  public moveRight(): boolean {
+    const tetrimino = { ...this.tetrimino, col: this.tetrimino.col + 1 }
+    return this.checkAndUpdateIfMoveValid(tetrimino);
+  }
+
+  public rotate(direction: RotateDirection): boolean {
+    const {rotation, col, row} = this.tetrimino;
+    const newRotation = this.calculateNewRotation(rotation, direction);
+    let kickTable: Array<[number, number]>;
+
+    // check rotation and wall kicks
+    kickTable = (TetriminoType.I === this.tetrimino.type ? KickTableI : KickTableJLSTZ)[rotation][direction] as Array<[number, number]>;
+    for (let kick of kickTable) {
+      let tetrimino = { ...this.tetrimino, col: col + kick[0], row: row + kick[1], rotation: newRotation }
+      if (this.checkAndUpdateIfMoveValid(tetrimino)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private fillBag() {
@@ -202,33 +256,6 @@ export class Tetris {
     }
   }
 
-  public moveLeft(): boolean {
-    const tetrimino = { ...this.tetrimino, col: this.tetrimino.col - 1 };
-    return this.checkAndUpdateIfMoveValid(tetrimino);
-  }
-
-  public moveRight(): boolean {
-    const tetrimino = { ...this.tetrimino, col: this.tetrimino.col + 1 }
-    return this.checkAndUpdateIfMoveValid(tetrimino);
-  }
-
-  public rotate(direction: RotateDirection): boolean {
-    const {rotation, col, row} = this.tetrimino;
-    const newRotation = this.calculateNewRotation(rotation, direction);
-    let kickTable: Array<[number, number]>;
-
-    // check rotation and wall kicks
-    kickTable = (TetriminoType.I === this.tetrimino.type ? KickTableI : KickTableJLSTZ)[rotation][direction] as Array<[number, number]>;
-    for (let kick of kickTable) {
-      let tetrimino = { ...this.tetrimino, col: col + kick[0], row: row + kick[1], rotation: newRotation }
-      if (this.checkAndUpdateIfMoveValid(tetrimino)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   private fall(): boolean {
     const newTetrimino = { ...this.tetrimino, row: this.tetrimino.row + 1 }
     if (this.isValidPosition(newTetrimino)) {
@@ -246,9 +273,6 @@ export class Tetris {
     return !this.isValidPosition(newTetrimino)
   }
 
-  public drop() {
-    while (this.fall()) {}
-  }
 
   private calculateNewRotation(rotation: TetriminoRotation, direction: RotateDirection): TetriminoRotation {
     return (direction === RotateDirection.Right ? rotation + 1 : rotation + 3) % 4
@@ -265,30 +289,6 @@ export class Tetris {
       console.log(this.nextUpdateAt);
       this.nextUpdateAt = Date.now() + 1000;
       console.log(this.nextUpdateAt)
-    }
-  }
-
-  public update() {
-    if( [TetrisState.Start, TetrisState.Paused, TetrisState.GameOver].includes(this.state) || !this.nextUpdateAt || Date.now() < this.nextUpdateAt) {
-      return;
-    }
-
-    if (this.state === TetrisState.Falling) {
-      this.handleFallingState();
-    } else if (this.state === TetrisState.Locking) {
-      this.lockPieceAndClear();
-      return;
-    } else if (this.state === TetrisState.Clearing) {
-      this.handleClearingState();
-    }
-
-    this.scheduleNextUpdate();
-  }
-
-  private handleFallingState() {
-    this.fall()
-    if (this.hasTouchedDown()) {
-      this.state = TetrisState.Locking;
     }
   }
 
